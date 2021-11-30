@@ -4,14 +4,14 @@ import MailerService from './mailer';
 import config from '../config';
 import argon2 from 'argon2';
 import { randomBytes } from 'crypto';
-import { IUser, IUserInputDTO, IUserInitProfile } from '../interfaces/IUser';
+import { IUser, IUserInputDTO } from '../interfaces/IUser';
 import { EventDispatcher, EventDispatcherInterface } from '../decorators/eventDispatcher';
 import events from '../subscribers/events';
 
 @Service()
 export default class AuthService {
   constructor(
-    @Inject('userModel') private userModel: Models.UserModel,
+    @men('userModel') private userModel: Models.UserModel,
     private mailer: MailerService,
     @Inject('logger') private logger,
     @EventDispatcher() private eventDispatcher: EventDispatcherInterface,
@@ -99,29 +99,6 @@ export default class AuthService {
     }
   }
 
-  public async InitProfile(email: string, initProfile: IUserInitProfile): Promise<{ user: IUser; token: string }> {
-    const userRecord = await this.userModel.findOne({ email });
-    if (!userRecord) {
-      throw new Error('User not registered');
-    }
-
-    if (userRecord.active) {
-      throw new Error('User already active');
-    }
-
-    await this.userModel.updateOne(
-      { email: userRecord.email },
-      {
-        ...initProfile,
-      },
-    );
-    const token = this.generateToken(userRecord);
-
-    const user = userRecord.toObject();
-    Reflect.deleteProperty(user, 'password');
-    Reflect.deleteProperty(user, 'salt');
-    return { user, token };
-  }
   private generateToken(user) {
     const today = new Date();
     const exp = new Date(today);

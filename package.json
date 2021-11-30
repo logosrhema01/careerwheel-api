@@ -54,6 +54,7 @@
     "moment-timezone": "^0.5.31",
     "mongoose": "^5.10.6",
     "morgan": "^1.10.0",
+    "react-step-builder": "^2.0.11",
     "reflect-metadata": "^0.1.13",
     "typedi": "^0.8.0",
     "winston": "^3.3.3"

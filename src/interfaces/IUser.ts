@@ -17,9 +17,6 @@ export interface IUser {
 export interface IUserInputDTO {
   email: string;
   password: string;
-}
-
-export interface IUserInitProfile {
   firstName: string;
   lastName: string;
   dob: Date;

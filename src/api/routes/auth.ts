@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { Container } from 'typedi';
 import AuthService from '../../services/auth';
-import { IUserInputDTO, IUserInitProfile } from '../../interfaces/IUser';
+import { IUserInputDTO } from '../../interfaces/IUser';
 import middlewares from '../middlewares';
 import { celebrate, Joi } from 'celebrate';
 import { Logger } from 'winston';
@@ -17,6 +17,12 @@ export default (app: Router) => {
       body: Joi.object({
         email: Joi.string().required(),
         password: Joi.string().required(),
+        firstName: Joi.string().required(),
+        lastName: Joi.string().required(),
+        dob: Joi.string().required(),
+        gender: Joi.string().required(),
+        location: Joi.string().required(),
+        occupation: Joi.string().required(),
       }),
     }),
     async (req: Request, res: Response, next: NextFunction) => {
@@ -48,36 +54,12 @@ export default (app: Router) => {
         const { email, password } = req.body;
         const authServiceInstance = Container.get(AuthService);
         const { user, token } = await authServiceInstance.SignIn(email, password);
-        if (!user.emailVerified) return res.json({ user, token, message: 'Please verify your email' }).status(205);
-        if (!user.active) return res.json({ user, token, message: 'Please complete basic information' }).status(206);
+        if (!user.active) return res.json({ user, token, message: 'Please complete basic information' }).status(205);
         return res.json({ user, token }).status(200);
       } catch (e) {
         logger.error('🔥 error: %o', e);
         return next(e);
       }
-    },
-  );
-  route.post(
-    '/profileInit',
-    celebrate({
-      body: Joi.object({
-        firstName: Joi.string().required(),
-        lastName: Joi.string().required(),
-        dob: Joi.string().required(),
-        gender: Joi.string().required(),
-        location: Joi.string().required(),
-        occupation: Joi.string().required(),
-      }),
-    }),
-    middlewares.isAuth,
-    middlewares.attachCurrentUser,
-    async (req: Request, res: Response) => {
-      const authServiceInstance = Container.get(AuthService);
-      const { user, token } = await authServiceInstance.InitProfile(
-        req.currentUser.email,
-        req.body as IUserInitProfile,
-      );
-      return res.json({ user, token }).status(200);
     },
   );
 
