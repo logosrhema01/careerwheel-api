@@ -11,7 +11,7 @@ import events from '../subscribers/events';
 @Service()
 export default class AuthService {
   constructor(
-    @men('userModel') private userModel: Models.UserModel,
+    @Inject('userModel') private userModel: Models.UserModel,
     private mailer: MailerService,
     @Inject('logger') private logger,
     @EventDispatcher() private eventDispatcher: EventDispatcherInterface,
