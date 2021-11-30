@@ -8,6 +8,7 @@ export default async (): Promise<Db> => {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true,
+    tlsInsecure: true,
   });
   return connection.connection.db;
 };
